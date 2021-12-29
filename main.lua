@@ -1,9 +1,7 @@
---https://github.com/Mokiros/roblox-FE-compatibility
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
 local Player,game,owner = owner,game
 local RealPlayer = Player
 do
-	print("FE Compatibility code V2 by Mokiros")
 	local RealPlayer = RealPlayer
 	script.Parent = RealPlayer.Character
 
@@ -28,9 +26,9 @@ do
 	end
 
 	--Creating fake input objects with fake variables
-    local FakeMouse = {Hit=CFrame.new(),KeyUp=fakeEvent(),KeyDown=fakeEvent(),Button1Up=fakeEvent(),Button1Down=fakeEvent(),Button2Up=fakeEvent(),Button2Down=fakeEvent()}
-    FakeMouse.keyUp = FakeMouse.KeyUp
-    FakeMouse.keyDown = FakeMouse.KeyDown
+	local FakeMouse = {Hit=CFrame.new(),KeyUp=fakeEvent(),KeyDown=fakeEvent(),Button1Up=fakeEvent(),Button1Down=fakeEvent(),Button2Up=fakeEvent(),Button2Down=fakeEvent()}
+	FakeMouse.keyUp = FakeMouse.KeyUp
+	FakeMouse.keyDown = FakeMouse.KeyDown
 	local UIS = {InputBegan=fakeEvent(),InputEnded=fakeEvent()}
 	local CAS = {Actions={},BindAction=function(self,name,fun,touch,...)
 		CAS.Actions[name] = fun and {Name=name,Function=fun,Keys={...}} or nil
@@ -51,7 +49,7 @@ do
 	local Event = Instance.new("RemoteEvent")
 	Event.Name = "UserInput_Event"
 	Event.OnServerEvent:Connect(function(plr,io)
-	    if plr~=RealPlayer then return end
+		if plr~=RealPlayer then return end
 		FakeMouse.Target = io.Target
 		FakeMouse.Hit = io.Hit
 		if not io.isMouse then
@@ -71,7 +69,7 @@ do
 			end
 			FakeMouse:TriggerEvent(b and "KeyDown" or "KeyUp",io.KeyCode.Name:lower())
 			UIS:TriggerEvent(b and "InputBegan" or "InputEnded",io,false)
-	    end
+		end
 	end)
 	Event.Parent = NLS([==[local Event = script:WaitForChild("UserInput_Event")
 	local Mouse = owner:GetMouse()
@@ -109,7 +107,7 @@ do
 			local s = rawget(self,"_RealService")
 			if s then
 				return typeof(s[k])=="function"
-				and function(_,...)return s[k](s,...)end or s[k]
+					and function(_,...)return s[k](s,...)end or s[k]
 			end
 		end,
 		__newindex = function(self,k,v)
@@ -187,14 +185,23 @@ local sucess, err = pcall(function()
 	local rightShoulder = char:FindFirstChild("RightShoulderWeld",true)
 	local cam = workspace.CurrentCamera
 	local m = plr:GetMouse()
-	game:GetService("RunService").RenderStepped:connect(function()
-		pcall(function()
-			char.Torso["Neck"].C0 = char.Torso["Neck"].C0:Lerp(CFrame.new(0,1,0) * CFrame.Angles(math.asin((cam.CFrame.LookVector).unit.y) + 1.55,3.15,0),0.3)	
-		end)
+	
+	pcall(function()
+		for _,i in pairs(char:GetDescendants()) do
+			if i:IsA("BasePart") then
+				if i.Name == "Right Arm" or i.Name == "Left Arm" or i.Name == "Handle" then
+					i.LocalTransparencyModifier = 0
+					i:GetPropertyChangedSignal("LocalTransparencyModifier"):Connect(function()
+						i.LocalTransparencyModifier = 0
+					end)
+				end
+			end
+		end
 	end)
 
-	while task.wait(1) do
+	while true do
 		script.Parent.Look:FireServer(cam.CFrame.LookVector,cam.CFrame.Position)
+		game:GetService("RunService").Heartbeat:Wait()
 	end
 
 	]],char)
@@ -206,9 +213,14 @@ end
 
 remoteEvent.OnServerEvent:Connect(function(player, origin, hit)
 	local char = player.Character
-	pcall(function()
-		char.Torso["Neck"].C0 = char.Torso["Neck"].C0:Lerp(CFrame.new(0,1,0) * CFrame.Angles(math.asin((origin).unit.y) + 1.55,3.15,0),0.3)			
-	end)
+	if char:FindFirstChild("Torso") and char:FindFirstChild("Right Arm") and char:FindFirstChild("Left Arm") and char:FindFirstChild("Right Leg") and char:FindFirstChild("Left Leg") then
+		char.Torso["Right Shoulder"].C0 = char.Torso["Right Shoulder"].C0:Lerp(CFrame.new(1,0.5,0) * CFrame.Angles(math.asin((origin).unit.y),1.55,0),0.3)
+		char.Torso["Left Shoulder"].C0 = char.Torso["Left Shoulder"].C0:Lerp(CFrame.new(-1,0.5,0) * CFrame.Angles(math.asin((origin).unit.y),-1.55,0),0.3)
+		char.Torso["Neck"].C0 = char.Torso["Neck"].C0:Lerp(CFrame.new(0,1,0) * CFrame.Angles(math.asin((origin).unit.y) + 1.55,3.15,0),0.3)
+	end
+	if dbc == false then
+		rightShoulder.C0 = char.Torso["Right Shoulder"].C0 * CFrame.new(0.551, -1.004, -0.373) * CFrame.Angles(math.rad(22.002), math.rad(-12.204), math.rad(152.407))
+	end
 end)
 
 local Pan = Instance.new("Part")
@@ -267,22 +279,23 @@ end
 mouse.Button1Down:Connect(function()
 	if dbc == false then
 		dbc = true
-		local params = RaycastParams.new()
-		params.FilterDescendantsInstances = {char}
-		params.FilterType = Enum.RaycastFilterType.Blacklist
-		local result = workspace:Raycast(hrp.Position,hrp.Position + (hrp.CFrame.LookVector * 3),params)
 		PanSwing:Play()
-		if result and result.Instance then
-			local model = result.Instance:FindFirstAncestorWhichIsA("Model")
-			if model then
-				local hum = model:FindFirstChildWhichIsA("Humanoid",true)
-				if hum then
-					PanHit.PlaybackSpeed = math.random(9,12) / 10
-					if PanHit.PlaybackSpeed < 0 then
-						PanHit.PlaybackSpeed = 1
+		for _,p in pairs(workspace:GetDescendants()) do
+			if p:IsA("Model") then
+				if p ~= char and p:FindFirstChildWhichIsA("Humanoid") then
+					local targethrp = p:FindFirstChild("HumanoidRootPart",true) or p:FindFirstChild("Torso",true) or p:FindFirstChild("Head",true)
+					if targethrp then
+						local dist = (targethrp.Position - hrp.Position).Magnitude
+						if dist < 4 then
+							local humanoid = p:FindFirstChildWhichIsA("Humanoid")
+							PanHit.PlaybackSpeed = math.random(9,12) / 10
+							if PanHit.PlaybackSpeed < 0 then
+								PanHit.PlaybackSpeed = 1
+							end
+							PanHit:Play()
+							humanoid.Health -= 10
+						end
 					end
-					PanHit:Play()
-					hum.Health -= 10
 				end
 			end
 		end
