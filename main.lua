@@ -148,12 +148,36 @@ do
 	game,owner = FakeGame,FakeGame.Players.LocalPlayer
 end
 
+
+--Make UIS work
+
+local InputBegan = Instance.new("BindableEvent",script)
+local InputEnded = Instance.new("BindableEvent",script)
+InputBegan.Name = "InputBegan"
+InputEnded.Name = "InputEnded"
+
+NLS([==[
+local uis = game:GetService("UserInputService")
+uis.InputBegan:Connect(function(input,gameProcessed)
+	if script.Parent:FindFirstChild("InputBegan") then
+		script.Parent.InputBegan:Fire(input,gameProcessed)
+	end
+end)
+uis.InputEnded:Connect(function(input,gameProcessed)
+	if script.Parent:FindFirstChild("InputEnded") then
+		script.Parent.InputEnded:Fire(input,gameProcessed)
+	end
+end)
+]==],script)
+
+
 local rs = game:GetService("RunService")
 local ts = game:GetService("TweenService")
 local mouse = owner:GetMouse()
 local char = owner.Character or owner.CharacterAdded:Wait()
 
 local dbc = false
+local sprint = false
 local animTime = 0.2 --change if you want
 
 repeat task.wait() until char:FindFirstChildWhichIsA("Humanoid")
@@ -165,6 +189,22 @@ repeat task.wait() until char:FindFirstChild("HumanoidRootPart") or char:FindFir
 local hrp = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
 
 if hum.RigType == Enum.HumanoidRigType.R15 then error("This script isn't compatible with R15 rig types!") end
+
+InputBegan.Event:Connect(function(input,gameProcessed)
+	if not gameProcessed then
+		if input.KeyCode == Enum.KeyCode.LeftShift then
+			sprint = true
+		end
+	end
+end)
+
+InputEnded.Event:Connect(function(input,gameProcessed)
+	if not gameProcessed then
+		if input.KeyCode == Enum.KeyCode.LeftShift then
+			sprint = false
+		end
+	end
+end)
 
 local rightShoulder = Instance.new("Weld",char.Torso)
 rightShoulder.Name = "RightShoulderWeld"
@@ -303,3 +343,13 @@ mouse.Button1Down:Connect(function()
 		dbc = false
 	end
 end)
+
+coroutine.wrap(function()
+	while task.wait() do
+		if sprint == false then
+			hum.WalkSpeed = game.StarterPlayer.CharacterWalkSpeed
+		else
+			hum.WalkSpeed = 25
+		end
+	end
+end)()
