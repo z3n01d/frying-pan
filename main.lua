@@ -347,9 +347,9 @@ end)
 coroutine.wrap(function()
 	while task.wait() do
 		if sprint == false then
-			hum.WalkSpeed = game.StarterPlayer.CharacterWalkSpeed
+			hum.WalkSpeed = 16
 		else
-			hum.WalkSpeed = 25
+			hum.WalkSpeed = 35
 		end
 	end
 end)()
