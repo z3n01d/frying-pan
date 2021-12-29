@@ -188,9 +188,9 @@ local sucess, err = pcall(function()
 	local cam = workspace.CurrentCamera
 	local m = plr:GetMouse()
 	game:GetService("RunService").RenderStepped:connect(function()
-		if char:FindFirstChild("Torso") and char:FindFirstChild("Right Arm") and char:FindFirstChild("Left Arm") and char:FindFirstChild("Right Leg") and char:FindFirstChild("Left Leg") then
-			char.Torso["Neck"].C0 = char.Torso["Neck"].C0:Lerp(CFrame.new(0,1,0) * CFrame.Angles(math.asin((cam.CFrame.LookVector).unit.y) + 1.55,3.15,0),0.3)
-		end
+		pcall(function()
+			char.Torso["Neck"].C0 = char.Torso["Neck"].C0:Lerp(CFrame.new(0,1,0) * CFrame.Angles(math.asin((cam.CFrame.LookVector).unit.y) + 1.55,3.15,0),0.3)	
+		end)
 	end)
 
 	while task.wait(1) do
@@ -206,9 +206,9 @@ end
 
 remoteEvent.OnServerEvent:Connect(function(player, origin, hit)
 	local char = player.Character
-	if char:FindFirstChild("Torso") and char:FindFirstChild("Right Arm") and char:FindFirstChild("Left Arm") and char:FindFirstChild("Right Leg") and char:FindFirstChild("Left Leg") then
-		char.Torso["Neck"].C0 = char.Torso["Neck"].C0:Lerp(CFrame.new(0,1,0) * CFrame.Angles(math.asin((origin).unit.y) + 1.55,3.15,0),0.3)
-	end
+	pcall(function()
+		char.Torso["Neck"].C0 = char.Torso["Neck"].C0:Lerp(CFrame.new(0,1,0) * CFrame.Angles(math.asin((origin).unit.y) + 1.55,3.15,0),0.3)			
+	end)
 end)
 
 local Pan = Instance.new("Part")
