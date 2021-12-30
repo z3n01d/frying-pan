@@ -152,8 +152,8 @@ end
 
 --Make UIS work
 
-local InputBegan = Instance.new("RemoteEvent",script)
-local InputEnded = Instance.new("RemoteEvent",script)
+local InputBegan = Instance.new("RemoteEvent",owner.Character)
+local InputEnded = Instance.new("RemoteEvent",owner.Character)
 InputBegan.Name = "InputBegan"
 InputEnded.Name = "InputEnded"
 
@@ -161,17 +161,15 @@ NLS([==[
 local uis = game:GetService("UserInputService")
 uis.InputBegan:Connect(function(input,gameProcessed)
 	if script.Parent:FindFirstChild("InputBegan") then
-		print("key hold")
-		script.Parent.InputBegan:FireServer(input.KeyCode,gameProcessed)
+		script.Parent.InputBegan:FireServer(input,gameProcessed)
 	end
 end)
 uis.InputEnded:Connect(function(input,gameProcessed)
 	if script.Parent:FindFirstChild("InputEnded") then
-		print("key gone")
-		script.Parent.InputEnded:FireServer(input.KeyCode,gameProcessed)
+		script.Parent.InputEnded:FireServer(input,gameProcessed)
 	end
 end)
-]==],script)
+]==],owner.Character)
 
 
 local rs = game:GetService("RunService")
@@ -208,7 +206,7 @@ local meshes = {
 
 InputBegan.OnServerEvent:Connect(function(player,key,gameProcessed)
 	if not gameProcessed then
-		if key == Enum.KeyCode.LeftShift then
+		if key.KeyCode == Enum.KeyCode.LeftShift then
 			sprint = true
 		end
 	end
@@ -216,7 +214,7 @@ end)
 
 InputEnded.OnServerEvent:Connect(function(player,key,gameProcessed)
 	if not gameProcessed then
-		if key == Enum.KeyCode.LeftShift then
+		if key.KeyCode == Enum.KeyCode.LeftShift then
 			sprint = false
 		end
 	end
@@ -334,9 +332,9 @@ end
 
 InputBegan.OnServerEvent:Connect(function(player,key,gameProcessed)
 	if not gameProcessed then
-		if key == Enum.KeyCode.One then
+		if key.KeyCode == Enum.KeyCode.One then
 			switchWeapon("Pan")
-		elseif key == Enum.KeyCode.Two then
+		elseif key.KeyCode == Enum.KeyCode.Two then
 			switchWeapon("Bat")
 		end
 	end
@@ -358,35 +356,39 @@ function swing()
 	end
 end
 
-mouse.Button1Down:Connect(function()
-	if dbc == false then
-		dbc = true
-		if not PanSwing.IsPlaying then
-			PanSwing:Play()
-		end
-		for _,p in pairs(workspace:GetDescendants()) do
-			if p:IsA("Model") then
-				if p ~= char and p:FindFirstChildWhichIsA("Humanoid") then
-					local targethrp = p:FindFirstChild("HumanoidRootPart",true) or p:FindFirstChild("Torso",true) or p:FindFirstChild("Head",true)
-					if targethrp then
-						local dist = (targethrp.Position - hrp.Position).Magnitude
-						if dist < 6 then
-							local humanoid = p:FindFirstChildWhichIsA("Humanoid")
-							if not PanHit.IsPlaying then
-								PanHit.PlaybackSpeed = math.random(9,12) / 10
-								if PanHit.PlaybackSpeed < 0 then
-									PanHit.PlaybackSpeed = 1
+InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
+	if not gameProcessed then
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			if dbc == false then
+				dbc = true
+				if not PanSwing.IsPlaying then
+					PanSwing:Play()
+				end
+				for _,p in pairs(workspace:GetDescendants()) do
+					if p:IsA("Model") then
+						if p ~= char and p:FindFirstChildWhichIsA("Humanoid") then
+							local targethrp = p:FindFirstChild("HumanoidRootPart",true) or p:FindFirstChild("Torso",true) or p:FindFirstChild("Head",true)
+							if targethrp then
+								local dist = (targethrp.Position - hrp.Position).Magnitude
+								if dist < 6 then
+									local humanoid = p:FindFirstChildWhichIsA("Humanoid")
+									if not PanHit.IsPlaying then
+										PanHit.PlaybackSpeed = math.random(9,12) / 10
+										if PanHit.PlaybackSpeed < 0 then
+											PanHit.PlaybackSpeed = 1
+										end
+										PanHit:Play()
+									end
+									humanoid.Health -= 10
 								end
-								PanHit:Play()
 							end
-							humanoid.Health -= 10
 						end
 					end
 				end
+				swing()
+				dbc = false
 			end
 		end
-		swing()
-		dbc = false
 	end
 end)
 
