@@ -161,12 +161,20 @@ NLS([==[
 local uis = game:GetService("UserInputService")
 uis.InputBegan:Connect(function(input,gameProcessed)
 	if script.Parent:FindFirstChild("InputBegan") then
-		script.Parent.InputBegan:FireServer(input,gameProcessed)
+		script.Parent.InputBegan:FireServer({
+			KeyCode = input.KeyCode,
+			UserInputType = input.UserInputType,
+			UserInputState = input.UserInputState,
+		},gameProcessed)
 	end
 end)
 uis.InputEnded:Connect(function(input,gameProcessed)
 	if script.Parent:FindFirstChild("InputEnded") then
-		script.Parent.InputEnded:FireServer(input,gameProcessed)
+		script.Parent.InputBegan:FireServer({
+			KeyCode = input.KeyCode,
+			UserInputType = input.UserInputType,
+			UserInputState = input.UserInputState,
+		},gameProcessed)
 	end
 end)
 ]==],owner.Character)
