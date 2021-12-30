@@ -344,7 +344,7 @@ PanSwing.SoundId = "rbxassetid://7122602098"
 PanSwing.Volume = 1
 
 local Gauntlet = Instance.new("Part")
-SpecialMesh1 = Instance.new("SpecialMesh")
+local SpecialMesh2 = Instance.new("SpecialMesh")
 Gauntlet.Name = "Gauntlet"
 Gauntlet.Parent = char
 Gauntlet.Size = Vector3.new(4, 3, 3)
@@ -354,11 +354,11 @@ Gauntlet.CanTouch = false
 Gauntlet.CanQuery = false
 Gauntlet.Massless = true
 Gauntlet.TopSurface = Enum.SurfaceType.Smooth
-SpecialMesh1.Parent = Gauntlet
-SpecialMesh1.MeshId = "rbxassetid://3193272180"
-SpecialMesh1.Scale = Vector3.new(1.5, 1.5, 1.5)
-SpecialMesh1.TextureId = "rbxassetid://3193272270"
-SpecialMesh1.MeshType = Enum.MeshType.FileMesh
+SpecialMesh2.Parent = Gauntlet
+SpecialMesh2.MeshId = "rbxassetid://3193272180"
+SpecialMesh2.Scale = Vector3.new(1.5, 1.5, 1.5)
+SpecialMesh2.TextureId = "rbxassetid://3193272270"
+SpecialMesh2.MeshType = Enum.MeshType.FileMesh
 
 local handle = Instance.new("Weld",char["Right Arm"])
 handle.Part0 = char["Right Arm"]
@@ -448,7 +448,7 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 								PanHit.PlaybackSpeed = 1
 							end
 							PanHit:Play()
-							humanoid.Health -= 10
+							humanoid:TakeDamage(5)
 						end
 					end
 				end
