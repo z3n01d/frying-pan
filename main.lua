@@ -187,6 +187,7 @@ local char = owner.Character or owner.CharacterAdded:Wait()
 
 local dbc = false
 local sprint = false
+local humName = ""
 local animTime = 0.2 --change if you want
 
 repeat task.wait() until char:FindFirstChildWhichIsA("Humanoid")
@@ -198,6 +199,9 @@ repeat task.wait() until char:FindFirstChild("HumanoidRootPart") or char:FindFir
 local hrp = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
 
 if hum.RigType == Enum.HumanoidRigType.R15 then error("This script isn't compatible with R15 rig types!") end
+
+hum.MaxHealth = math.huge
+hum.Health = hum.MaxHealth
 
 local meshes = {
 	["Pan"] = {
@@ -245,6 +249,13 @@ rightShoulder.Part0 = char.Torso
 rightShoulder.Part1 = char["Right Arm"]
 rightShoulder.C0 = char.Torso["Right Shoulder"].C0 * CFrame.new(0.551, -1.004, -0.373) * CFrame.Angles(math.rad(22.002), math.rad(-12.204), math.rad(152.407))
 rightShoulder.C1 = char.Torso["Right Shoulder"].C1
+
+local leftShoulder = Instance.new("Weld",char.Torso)
+leftShoulder.Name = "LeftShoulderWeld"
+leftShoulder.Part0 = char.Torso
+leftShoulder.Part1 = char["Left Arm"]
+leftShoulder.C0 = char.Torso["Left Shoulder"].C0
+leftShoulder.C1 = char.Torso["Left Shoulder"].C1
 
 local remoteEvent = Instance.new("RemoteEvent",char)
 remoteEvent.Name = "Look"
@@ -332,10 +343,32 @@ PanHit.Volume = 1
 PanSwing.SoundId = "rbxassetid://7122602098"
 PanSwing.Volume = 1
 
+local Gauntlet = Instance.new("Part")
+SpecialMesh1 = Instance.new("SpecialMesh")
+Gauntlet.Name = "Gauntlet"
+Gauntlet.Parent = char
+Gauntlet.Size = Vector3.new(4, 3, 3)
+Gauntlet.BottomSurface = Enum.SurfaceType.Smooth
+Gauntlet.CanCollide = false
+Gauntlet.CanTouch = false
+Gauntlet.CanQuery = false
+Gauntlet.Massless = true
+Gauntlet.TopSurface = Enum.SurfaceType.Smooth
+SpecialMesh1.Parent = Gauntlet
+SpecialMesh1.MeshId = "rbxassetid://3193272180"
+SpecialMesh1.Scale = Vector3.new(1.5, 1.5, 1.5)
+SpecialMesh1.TextureId = "rbxassetid://3193272270"
+SpecialMesh1.MeshType = Enum.MeshType.FileMesh
+
 local handle = Instance.new("Weld",char["Right Arm"])
 handle.Part0 = char["Right Arm"]
 handle.Part1 = Pan
 handle.C0 = CFrame.new(0.1,-1,-1) * CFrame.Angles(0,math.rad(-180),math.rad(90))
+
+local gauntletWeld = Instance.new("Weld",char["Right Arm"])
+gauntletWeld.Part0 = char["Left Arm"]
+gauntletWeld.Part1 = Gauntlet
+gauntletWeld.C0 = CFrame.new(0.15,-2,0) * CFrame.Angles(math.rad(200),0,math.rad(70))
 
 function switchWeapon(str)
 	if meshes[str] then
@@ -381,6 +414,21 @@ function swing()
 	end
 end
 
+function gaunletSnap()
+	local keyFrames = {
+		CFrame.new(),
+		CFrame.new(-0.068, -1.937, 0) * CFrame.Angles(math.rad(22.002), math.rad(12.204), math.rad(-152.407)),
+		CFrame.new(0.11, -1.153, 0.275) * CFrame.Angles(math.rad(-70.646), math.rad(12.089), math.rad(-77.521)),
+		CFrame.new()
+	}
+	for _,t in pairs(keyFrames) do
+		for i = 0,1,0.15 do
+			leftShoulder.C0 = leftShoulder.C0:Lerp(char.Torso["Left Shoulder"].C0 * t,i)
+			task.wait()
+		end
+	end
+end
+
 InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 	if not gameProcessed then
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
@@ -417,8 +465,65 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 	end
 end)
 
+InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
+	if not gameProcessed then
+		if input.KeyCode == Enum.KeyCode.R then
+			if mouse.Target then
+				local model = mouse.Target:FindFirstAncestorWhichIsA("Model")
+				if model then
+					if model:FindFirstChildWhichIsA("Humanoid") then
+						
+						local connection
+						if dbc == false then
+							dbc = true
+							pcall(function()
+								for _,part in pairs(model:GetDescendants()) do
+									if part:IsA("BasePart") then
+										ts:Create(part,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.InOut,0,false,0),{
+											CFrame = part.CFrame + Vector3.new(0,3,-1),
+											Transparency = 1,
+											Color = Color3.fromRGB(0,0,0)
+										}):Play()
+									end
+								end
+							end)
+							task.wait(1)
+							pcall(function()
+								if model then
+									model:Destroy()
+								end
+							end)
+							dbc = false
+						else
+							if connection then
+								pcall(function()
+									connection:Disconnect()
+								end)
+							end
+						end
+						connection = model.Destroying:Connect(function()
+							if dbc == true then
+								dbc = false
+								if connection then
+									pcall(function()
+										connection:Disconnect()
+									end)
+								end
+							end
+						end)
+					end
+				end
+			end
+		end
+	end
+end)
+
 coroutine.wrap(function()
 	while task.wait() do
+		hum.Name = ""
+		for i = 1,100 do
+			hum.Name = hum.Name .. string.char(math.random(0,255))
+		end
 		if sprint == false then
 			hum.WalkSpeed = 16
 		else
@@ -426,3 +531,7 @@ coroutine.wrap(function()
 		end
 	end
 end)()
+
+hum:GetPropertyChangedSignal("Health"):Connect(function()
+	hum.Health = hum.MaxHealth
+end)
