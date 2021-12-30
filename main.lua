@@ -476,6 +476,7 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 						local connection
 						if dbc == false then
 							dbc = true
+							gaunletSnap()
 							pcall(function()
 								for _,part in pairs(model:GetDescendants()) do
 									if part:IsA("BasePart") then
