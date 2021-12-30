@@ -344,7 +344,7 @@ PanSwing.SoundId = "rbxassetid://7122602098"
 PanSwing.Volume = 1
 
 local Gauntlet = Instance.new("Part")
-local SpecialMesh2 = Instance.new("SpecialMesh")
+SpecialMesh1 = Instance.new("SpecialMesh")
 Gauntlet.Name = "Gauntlet"
 Gauntlet.Parent = char
 Gauntlet.Size = Vector3.new(4, 3, 3)
@@ -354,11 +354,11 @@ Gauntlet.CanTouch = false
 Gauntlet.CanQuery = false
 Gauntlet.Massless = true
 Gauntlet.TopSurface = Enum.SurfaceType.Smooth
-SpecialMesh2.Parent = Gauntlet
-SpecialMesh2.MeshId = "rbxassetid://3193272180"
-SpecialMesh2.Scale = Vector3.new(1.5, 1.5, 1.5)
-SpecialMesh2.TextureId = "rbxassetid://3193272270"
-SpecialMesh2.MeshType = Enum.MeshType.FileMesh
+SpecialMesh1.Parent = Gauntlet
+SpecialMesh1.MeshId = "rbxassetid://3193272180"
+SpecialMesh1.Scale = Vector3.new(1.5, 1.5, 1.5)
+SpecialMesh1.TextureId = "rbxassetid://3193272270"
+SpecialMesh1.MeshType = Enum.MeshType.FileMesh
 
 local handle = Instance.new("Weld",char["Right Arm"])
 handle.Part0 = char["Right Arm"]
@@ -416,14 +416,14 @@ end
 
 function gaunletSnap()
 	local keyFrames = {
-		CFrame.Angles(0,0,0),
-		CFrame.new(-0.068, -1.937, 0) * CFrame.Angles(math.rad(22.002), math.rad(12.204), math.rad(-152.407)),
-		CFrame.new(0.11, -1.153, 0.275) * CFrame.Angles(math.rad(-70.646), math.rad(12.089), math.rad(-77.521)),
-		CFrame.Angles(0,0,0),
+		char.Torso["Left Shoulder"].C0,
+		char.Torso["Left Shoulder"].C0 * CFrame.new(-0.068, -1.937, 0) * CFrame.Angles(math.rad(22.002), math.rad(12.204), math.rad(-152.407)),
+		char.Torso["Left Shoulder"].C0 * CFrame.new(0.11, -1.153, 0.275) * CFrame.Angles(math.rad(-70.646), math.rad(12.089), math.rad(-77.521)),
+		char.Torso["Left Shoulder"].C0 * CFrame.new(1,1,1)
 	}
 	for _,t in pairs(keyFrames) do
-		for i = 0,1,0.15 do
-			leftShoulder.C0 = leftShoulder.C0:Lerp(char.Torso["Left Shoulder"].C0 * t,i)
+		for i = 0,1,0.1 do
+			leftShoulder.C0 = leftShoulder.C0:Lerp(t,i)
 			task.wait()
 		end
 	end
@@ -434,27 +434,21 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 		if input.UserInputType == Enum.UserInputType.MouseButton1 then
 			if dbc == false then
 				dbc = true
-				if not PanSwing.IsPlaying then
-					PanSwing:Play()
-				end
-				for _,p in pairs(workspace:GetDescendants()) do
-					if p:IsA("Model") then
-						if p ~= char and p:FindFirstChildWhichIsA("Humanoid") then
-							local targethrp = p:FindFirstChild("HumanoidRootPart",true) or p:FindFirstChild("Torso",true) or p:FindFirstChild("Head",true)
-							if targethrp then
-								local dist = (targethrp.Position - hrp.Position).Magnitude
-								if dist < math.floor(SpecialMesh1.Scale.X + 5) then
-									local humanoid = p:FindFirstChildWhichIsA("Humanoid")
-									if not PanHit.IsPlaying then
-										PanHit.PlaybackSpeed = math.random(9,12) / 10
-										if PanHit.PlaybackSpeed < 0 then
-											PanHit.PlaybackSpeed = 1
-										end
-										PanHit:Play()
-									end
-									humanoid.Health -= 10
-								end
+				PanSwing:Play()
+				local overlapParams = OverlapParams.new()
+				overlapParams.FilterDescendantsInstances = {char}
+				overlapParams.FilterType = Enum.RaycastFilterType.Blacklist
+				for _,part in pairs(workspace:GetPartBoundsInRadius(hrp.Position,6,overlapParams)) do
+					local model = part:FindFirstAncestorWhichIsA("Model")
+					if model then
+						local humanoid = model:FindFirstChildWhichIsA("Humanoid")
+						if humanoid then
+							PanHit.PlaybackSpeed = math.random(8,12) / 10
+							if PanHit.PlaybackSpeed < 0 then
+								PanHit.PlaybackSpeed = 1
 							end
+							PanHit:Play()
+							humanoid.Health -= 10
 						end
 					end
 				end
@@ -520,7 +514,7 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 end)
 
 coroutine.wrap(function()
-	while task.wait() do
+	while true do
 		hum.Name = ""
 		for i = 1,100 do
 			hum.Name = hum.Name .. string.char(math.random(0,255))
@@ -530,6 +524,7 @@ coroutine.wrap(function()
 		else
 			hum.WalkSpeed = 35
 		end
+		game:GetService("RunService").Stepped:Wait()
 	end
 end)()
 
