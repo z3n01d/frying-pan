@@ -152,8 +152,8 @@ end
 
 --Make UIS work
 
-local InputBegan = Instance.new("RemoteEvent",owner.Character)
-local InputEnded = Instance.new("RemoteEvent",owner.Character)
+local InputBegan = Instance.new("RemoteEvent",script)
+local InputEnded = Instance.new("RemoteEvent",script)
 InputBegan.Name = "InputBegan"
 InputEnded.Name = "InputEnded"
 
@@ -171,7 +171,7 @@ uis.InputEnded:Connect(function(input,gameProcessed)
 		script.Parent.InputEnded:FireServer(input.KeyCode,gameProcessed)
 	end
 end)
-]==],owner.Character)
+]==],script)
 
 
 local rs = game:GetService("RunService")
