@@ -1,4 +1,5 @@
 if game:GetService("RunService"):IsClient() then error("Script must be server-side in order to work; use h/ and not hl/") end
+print("TF2 Weapons by RealJace\nGitHub : github.com/RealJace")
 local Player,game,owner = owner,game
 local RealPlayer = Player
 do
@@ -151,8 +152,8 @@ end
 
 --Make UIS work
 
-local InputBegan = Instance.new("BindableEvent",owner.Character)
-local InputEnded = Instance.new("BindableEvent",owner.Character)
+local InputBegan = Instance.new("RemoteEvent",owner.Character)
+local InputEnded = Instance.new("RemoteEvent",owner.Character)
 InputBegan.Name = "InputBegan"
 InputEnded.Name = "InputEnded"
 
@@ -161,13 +162,13 @@ local uis = game:GetService("UserInputService")
 uis.InputBegan:Connect(function(input,gameProcessed)
 	if script.Parent:FindFirstChild("InputBegan") then
 		print("key hold")
-		script.Parent.InputBegan:Fire(input,gameProcessed)
+		script.Parent.InputBegan:FireServer(input.KeyCode,gameProcessed)
 	end
 end)
 uis.InputEnded:Connect(function(input,gameProcessed)
 	if script.Parent:FindFirstChild("InputEnded") then
 		print("key gone")
-		script.Parent.InputEnded:Fire(input,gameProcessed)
+		script.Parent.InputEnded:FireServer(input.KeyCode,gameProcessed)
 	end
 end)
 ]==],owner.Character)
@@ -192,17 +193,30 @@ local hrp = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Tors
 
 if hum.RigType == Enum.HumanoidRigType.R15 then error("This script isn't compatible with R15 rig types!") end
 
-InputBegan.Event:Connect(function(input,gameProcessed)
+local meshes = {
+	["Pan"] = {
+		id = "http://www.roblox.com/asset/?id=24342877",
+		texture = "http://www.roblox.com/asset/?id=24342832",
+		offset = Vector3.new(0,0,0),
+	},
+	["Bat"] = {
+		id = "http://www.roblox.com/asset/?id=54983181 ",
+		texture = "http://www.roblox.com/asset/?id=54983107",
+		offset = Vector3.new(0.15,0,0),
+	},
+}
+
+InputBegan.OnServerEvent:Connect(function(player,key,gameProcessed)
 	if not gameProcessed then
-		if input.KeyCode == Enum.KeyCode.LeftShift then
+		if key == Enum.KeyCode.LeftShift then
 			sprint = true
 		end
 	end
 end)
 
-InputEnded.Event:Connect(function(input,gameProcessed)
+InputEnded.OnServerEvent:Connect(function(player,key,gameProcessed)
 	if not gameProcessed then
-		if input.KeyCode == Enum.KeyCode.LeftShift then
+		if key == Enum.KeyCode.LeftShift then
 			sprint = false
 		end
 	end
@@ -220,7 +234,9 @@ remoteEvent.Name = "Look"
 
 local sucess, err = pcall(function()
 	NLS([[
-
+	
+	game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack,false)
+	
 	local plr = game:GetService("Players").LocalPlayer;
 	local char = plr.Character or plr.CharacterAdded:Wait()
 	repeat task.wait() until char:FindFirstChild("RightShoulderWeld",true)
@@ -248,6 +264,8 @@ local sucess, err = pcall(function()
 
 	]],char)
 end)
+
+hum:UnequipTools()
 
 if not sucess then
 	warn(err)
@@ -302,6 +320,28 @@ handle.Part0 = char["Right Arm"]
 handle.Part1 = Pan
 handle.C0 = CFrame.new(0.1,-1,-1) * CFrame.Angles(0,math.rad(-180),math.rad(90))
 
+function switchWeapon(str)
+	if meshes[str] then
+		SpecialMesh1.MeshId = meshes[str].id
+		SpecialMesh1.TextureId = meshes[str].texture
+		SpecialMesh1.Offset = meshes[str].offset
+	else
+		SpecialMesh1.MeshId = "http://www.roblox.com/asset/?id=24342877"
+		SpecialMesh1.TextureId = "http://www.roblox.com/asset/?id=24342832"
+		SpecialMesh1.Offset = Vector3.new(0,0,0)
+	end
+end
+
+InputBegan.OnServerEvent:Connect(function(player,key,gameProcessed)
+	if not gameProcessed then
+		if key == Enum.KeyCode.One then
+			switchWeapon("Pan")
+		elseif key == Enum.KeyCode.Two then
+			switchWeapon("Bat")
+		end
+	end
+end)
+
 function swing()
 	local keyFrames = {
 		CFrame.new(-0.301, 0.426, -0.132) * CFrame.Angles(math.rad(22.002), math.rad(-12.204), math.rad(-147.594)),
@@ -321,20 +361,24 @@ end
 mouse.Button1Down:Connect(function()
 	if dbc == false then
 		dbc = true
-		PanSwing:Play()
+		if not PanSwing.IsPlaying then
+			PanSwing:Play()
+		end
 		for _,p in pairs(workspace:GetDescendants()) do
 			if p:IsA("Model") then
 				if p ~= char and p:FindFirstChildWhichIsA("Humanoid") then
 					local targethrp = p:FindFirstChild("HumanoidRootPart",true) or p:FindFirstChild("Torso",true) or p:FindFirstChild("Head",true)
 					if targethrp then
 						local dist = (targethrp.Position - hrp.Position).Magnitude
-						if dist < 4 then
+						if dist < 6 then
 							local humanoid = p:FindFirstChildWhichIsA("Humanoid")
-							PanHit.PlaybackSpeed = math.random(9,12) / 10
-							if PanHit.PlaybackSpeed < 0 then
-								PanHit.PlaybackSpeed = 1
+							if not PanHit.IsPlaying then
+								PanHit.PlaybackSpeed = math.random(9,12) / 10
+								if PanHit.PlaybackSpeed < 0 then
+									PanHit.PlaybackSpeed = 1
+								end
+								PanHit:Play()
 							end
-							PanHit:Play()
 							humanoid.Health -= 10
 						end
 					end
