@@ -201,14 +201,25 @@ if hum.RigType == Enum.HumanoidRigType.R15 then error("This script isn't compati
 
 local meshes = {
 	["Pan"] = {
-		id = "http://www.roblox.com/asset/?id=24342877",
-		texture = "http://www.roblox.com/asset/?id=24342832",
+		id = "rbxassetid://24342877",
+		texture = "rbxassetid://24342832",
 		offset = Vector3.new(0,0,0),
+		scale = Vector3.new(1.5,1.5,1.5),
+		hitSound = "rbxassetid://3431749479",
 	},
 	["Bat"] = {
-		id = "http://www.roblox.com/asset/?id=54983181 ",
-		texture = "http://www.roblox.com/asset/?id=54983107",
+		id = "rbxassetid://54983181",
+		texture = "rbxassetid://54983107",
 		offset = Vector3.new(0.15,0,0),
+		scale = Vector3.new(1.5,1.5,1.5),
+		hitSound = "rbxassetid://3431749479",
+	},
+	["Spoon"] = {
+		id = "rbxassetid://431329906",
+		texture = "",
+		offset = Vector3.new(0, -0.2, 5),
+		scale = Vector3.new(10, -10, -10),
+		hitSound = "rbxassetid://5457077585",
 	},
 }
 
@@ -331,10 +342,14 @@ function switchWeapon(str)
 		SpecialMesh1.MeshId = meshes[str].id
 		SpecialMesh1.TextureId = meshes[str].texture
 		SpecialMesh1.Offset = meshes[str].offset
+		SpecialMesh1.Scale = meshes[str].scale
+		PanHit.SoundId = meshes[str].hitSound
 	else
 		SpecialMesh1.MeshId = "http://www.roblox.com/asset/?id=24342877"
 		SpecialMesh1.TextureId = "http://www.roblox.com/asset/?id=24342832"
 		SpecialMesh1.Offset = Vector3.new(0,0,0)
+		SpecialMesh1.Scale = Vector3.new(1.5,1.5,1.5)
+		PanHit.SoundId = "rbxassetid://3431749479"
 	end
 end
 
@@ -344,6 +359,8 @@ InputBegan.OnServerEvent:Connect(function(player,key,gameProcessed)
 			switchWeapon("Pan")
 		elseif key.KeyCode == Enum.KeyCode.Two then
 			switchWeapon("Bat")
+		elseif key.KeyCode == Enum.KeyCode.Three then
+			switchWeapon("Spoon")
 		end
 	end
 end)
@@ -378,7 +395,7 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 							local targethrp = p:FindFirstChild("HumanoidRootPart",true) or p:FindFirstChild("Torso",true) or p:FindFirstChild("Head",true)
 							if targethrp then
 								local dist = (targethrp.Position - hrp.Position).Magnitude
-								if dist < 6 then
+								if dist < math.floor(SpecialMesh1.Scale.X + 5) then
 									local humanoid = p:FindFirstChildWhichIsA("Humanoid")
 									if not PanHit.IsPlaying then
 										PanHit.PlaybackSpeed = math.random(9,12) / 10
