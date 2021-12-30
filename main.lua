@@ -151,8 +151,8 @@ end
 
 --Make UIS work
 
-local InputBegan = Instance.new("BindableEvent",script)
-local InputEnded = Instance.new("BindableEvent",script)
+local InputBegan = Instance.new("BindableEvent",owner.Character)
+local InputEnded = Instance.new("BindableEvent",owner.Character)
 InputBegan.Name = "InputBegan"
 InputEnded.Name = "InputEnded"
 
@@ -160,15 +160,17 @@ NLS([==[
 local uis = game:GetService("UserInputService")
 uis.InputBegan:Connect(function(input,gameProcessed)
 	if script.Parent:FindFirstChild("InputBegan") then
+		print("key hold")
 		script.Parent.InputBegan:Fire(input,gameProcessed)
 	end
 end)
 uis.InputEnded:Connect(function(input,gameProcessed)
 	if script.Parent:FindFirstChild("InputEnded") then
+		print("key gone")
 		script.Parent.InputEnded:Fire(input,gameProcessed)
 	end
 end)
-]==],script)
+]==],owner.Character)
 
 
 local rs = game:GetService("RunService")
