@@ -344,7 +344,7 @@ PanSwing.SoundId = "rbxassetid://7122602098"
 PanSwing.Volume = 1
 
 local Gauntlet = Instance.new("Part")
-SpecialMesh1 = Instance.new("SpecialMesh")
+local SpecialMesh2 = Instance.new("SpecialMesh")
 Gauntlet.Name = "Gauntlet"
 Gauntlet.Parent = char
 Gauntlet.Size = Vector3.new(4, 3, 3)
@@ -354,11 +354,11 @@ Gauntlet.CanTouch = false
 Gauntlet.CanQuery = false
 Gauntlet.Massless = true
 Gauntlet.TopSurface = Enum.SurfaceType.Smooth
-SpecialMesh1.Parent = Gauntlet
-SpecialMesh1.MeshId = "rbxassetid://3193272180"
-SpecialMesh1.Scale = Vector3.new(1.5, 1.5, 1.5)
-SpecialMesh1.TextureId = "rbxassetid://3193272270"
-SpecialMesh1.MeshType = Enum.MeshType.FileMesh
+SpecialMesh2.Parent = Gauntlet
+SpecialMesh2.MeshId = "rbxassetid://3193272180"
+SpecialMesh2.Scale = Vector3.new(1.5, 1.5, 1.5)
+SpecialMesh2.TextureId = "rbxassetid://3193272270"
+SpecialMesh2.MeshType = Enum.MeshType.FileMesh
 
 local handle = Instance.new("Weld",char["Right Arm"])
 handle.Part0 = char["Right Arm"]
@@ -416,10 +416,10 @@ end
 
 function gaunletSnap()
 	local keyFrames = {
-		CFrame.new(),
+		CFrame.Angles(0,0,0),
 		CFrame.new(-0.068, -1.937, 0) * CFrame.Angles(math.rad(22.002), math.rad(12.204), math.rad(-152.407)),
 		CFrame.new(0.11, -1.153, 0.275) * CFrame.Angles(math.rad(-70.646), math.rad(12.089), math.rad(-77.521)),
-		CFrame.new()
+		CFrame.Angles(0,0,0),
 	}
 	for _,t in pairs(keyFrames) do
 		for i = 0,1,0.15 do
