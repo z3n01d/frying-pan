@@ -471,7 +471,11 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 								PanHit.PlaybackSpeed = 1
 							end
 							PanHit:Play()
-							humanoid:TakeDamage(math.round(10 / #targetParts))
+							if #targetParts < 10 then
+								humanoid:TakeDamage(math.round(10 / #targetParts))		
+							else
+								humanoid:TakeDamage(5)		
+							end
 						end
 					end
 				end
