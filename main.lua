@@ -370,6 +370,22 @@ gauntletWeld.Part0 = char["Left Arm"]
 gauntletWeld.Part1 = Gauntlet
 gauntletWeld.C0 = CFrame.new(0.15,-2,0) * CFrame.Angles(math.rad(200),0,math.rad(70))
 
+local hitbox = Instance.new("Part",hrp)
+hitbox.Name = "Hitbox"
+hitbox.CanCollide = false
+hitbox.Massless = true
+hitbox.Anchored = false
+hitbox.Shape = Enum.PartType.Ball
+hitbox.Transparency = 1
+hitbox.Size = Vector3.new(10,10,10)
+
+local hitboxWeld = Instance.new("Weld",hrp)
+hitboxWeld.Part0 = hrp
+hitboxWeld.Part1 = hitbox
+
+local ff = Instance.new("ForceField",char)
+ff.Visible = false
+
 function switchWeapon(str)
 	if meshes[str] then
 		SpecialMesh1.MeshId = meshes[str].id
@@ -438,17 +454,24 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 				local overlapParams = OverlapParams.new()
 				overlapParams.FilterDescendantsInstances = {char}
 				overlapParams.FilterType = Enum.RaycastFilterType.Blacklist
-				for _,part in pairs(workspace:GetPartBoundsInRadius(hrp.Position,6,overlapParams)) do
+				hitbox.Size = Vector3.new(SpecialMesh1.Scale.X + 5,SpecialMesh1.Scale.X + 5,SpecialMesh1.Scale.X + 5)
+				for _,part in pairs(workspace:GetPartsInPart(hitbox,overlapParams)) do
 					local model = part:FindFirstAncestorWhichIsA("Model")
 					if model then
 						local humanoid = model:FindFirstChildWhichIsA("Humanoid")
 						if humanoid then
+							local targetParts = {}
+							for _,p in pairs(model:GetDescendants()) do
+								if p:IsA("Part") then
+									table.insert(targetParts,p)
+								end
+							end
 							PanHit.PlaybackSpeed = math.random(8,12) / 10
 							if PanHit.PlaybackSpeed < 0 then
 								PanHit.PlaybackSpeed = 1
 							end
 							PanHit:Play()
-							humanoid:TakeDamage(5)
+							humanoid:TakeDamage(math.round(10 / #targetParts))
 						end
 					end
 				end
@@ -466,7 +489,7 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 				local model = mouse.Target:FindFirstAncestorWhichIsA("Model")
 				if model then
 					if model:FindFirstChildWhichIsA("Humanoid") then
-						
+
 						local connection
 						if dbc == false then
 							dbc = true
@@ -530,4 +553,9 @@ end)()
 
 hum:GetPropertyChangedSignal("Health"):Connect(function()
 	hum.Health = hum.MaxHealth
+end)
+
+ff.Destroying:Connect(function()
+	ff = Instance.new("ForceField",char)
+	ff.Visible = false
 end)
