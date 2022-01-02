@@ -288,7 +288,44 @@ leftShoulder.C1 = char.Torso["Left Shoulder"].C1
 local remoteEvent = Instance.new("RemoteEvent",char)
 remoteEvent.Name = "Look"
 
+local sucess, err = pcall(function()
+	NLS([[
+	
+	game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.Backpack,false)
+	
+	local plr = game:GetService("Players").LocalPlayer;
+	local char = plr.Character or plr.CharacterAdded:Wait()
+	repeat task.wait() until char:FindFirstChild("RightShoulderWeld",true)
+	local rightShoulder = char:FindFirstChild("RightShoulderWeld",true)
+	local cam = workspace.CurrentCamera
+	local m = plr:GetMouse()
+	
+	pcall(function()
+		for _,i in pairs(char:GetDescendants()) do
+			if i:IsA("BasePart") then
+				if i.Name == "Right Arm" or i.Name == "Left Arm" or i.Name == "Handle" then
+					i.LocalTransparencyModifier = 0
+					i:GetPropertyChangedSignal("LocalTransparencyModifier"):Connect(function()
+						i.LocalTransparencyModifier = 0
+					end)
+				end
+			end
+		end
+	end)
+
+	while true do
+		script.Parent.Look:FireServer(cam.CFrame.LookVector,cam.CFrame.Position)
+		game:GetService("RunService").Heartbeat:Wait()
+	end
+
+	]],char)
+end)
+
 hum:UnequipTools()
+
+if not sucess then
+	warn(err)
+end
 
 remoteEvent.OnServerEvent:Connect(function(player, origin, hit)
 	local char = player.Character
