@@ -435,7 +435,7 @@ function gaunletSnap()
 		char.Torso["Left Shoulder"].C0,
 		char.Torso["Left Shoulder"].C0 * CFrame.new(-0.068, -1.937, 0) * CFrame.Angles(math.rad(22.002), math.rad(12.204), math.rad(-152.407)),
 		char.Torso["Left Shoulder"].C0 * CFrame.new(0.11, -1.153, 0.275) * CFrame.Angles(math.rad(-70.646), math.rad(12.089), math.rad(-77.521)),
-		char.Torso["Left Shoulder"].C0 * CFrame.new(1,1,1)
+		char.Torso["Left Shoulder"].C0,
 	}
 	for _,t in pairs(keyFrames) do
 		for i = 0,1,0.1 do
@@ -471,11 +471,7 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 								PanHit.PlaybackSpeed = 1
 							end
 							PanHit:Play()
-							if #targetParts < 10 then
-								humanoid:TakeDamage(math.round(10 / #targetParts))		
-							else
-								humanoid:TakeDamage(5)		
-							end
+							humanoid:TakeDamage(math.round(10 / #targetParts))
 						end
 					end
 				end
@@ -497,24 +493,22 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 						local connection
 						if dbc == false then
 							dbc = true
-							gaunletSnap()
-							pcall(function()
-								for _,part in pairs(model:GetDescendants()) do
-									if part:IsA("BasePart") then
-										ts:Create(part,TweenInfo.new(1,Enum.EasingStyle.Linear,Enum.EasingDirection.InOut,0,false,0),{
-											CFrame = part.CFrame + Vector3.new(0,3,-1),
-											Transparency = 1,
-											Color = Color3.fromRGB(0,0,0)
-										}):Play()
-									end
+							coroutine.wrap(function()
+								gaunletSnap()
+							end)()
+							for _,part in pairs(model:GetDescendants()) do
+								if part:IsA("BasePart") then
+									ts:Create(part,TweenInfo.new(0.2,Enum.EasingStyle.Linear,Enum.EasingDirection.InOut,0,false,0),{
+										CFrame = part.CFrame + Vector3.new(math.random(-40,40),math.random(-40,40),math.random(-40,40)),
+										Transparency = 1,
+										Color = Color3.fromRGB(0,0,0)
+									}):Play()
 								end
-							end)
-							task.wait(1)
-							pcall(function()
-								if model then
-									model:Destroy()
-								end
-							end)
+							end
+							task.wait(0.2)
+							if model then
+								model:Destroy()
+							end
 							dbc = false
 						else
 							if connection then
