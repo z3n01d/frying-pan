@@ -149,6 +149,34 @@ do
 	game,owner = FakeGame,FakeGame.Players.LocalPlayer
 end
 
+local ArtificialHB = Instance.new("BindableEvent",script)
+ArtificialHB.Name = "ArtificialHB"
+
+ArtificialHB = script:WaitForChild("ArtificialHB")
+
+local TargetFps = 60
+local TargetFrame = 1 / TargetFps
+local f = 0
+
+game:GetService("RunService").Heartbeat:Connect(function(s)
+	f = f + s
+	if f >= TargetFrame then
+		for i = 1,math.min(math.floor(f/TargetFrame),100) do
+			ArtificialHB:Fire(TargetFps)
+		end
+		f = f - TargetFrame * math.floor(f/TargetFrame)
+	end
+end)
+
+function swait(n)
+	if n then
+		for i = 1,n * 60 do
+			ArtificialHB.Event:Wait()
+		end
+	else
+		ArtificialHB.Event:Wait()
+	end
+end
 
 --Make UIS work
 
@@ -190,11 +218,11 @@ local sprint = false
 local humName = ""
 local animTime = 0.2 --change if you want
 
-repeat task.wait() until char:FindFirstChildWhichIsA("Humanoid")
+repeat swait() until char:FindFirstChildWhichIsA("Humanoid")
 
 local hum = char:FindFirstChildWhichIsA("Humanoid")
 
-repeat task.wait() until char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
+repeat swait() until char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
 
 local hrp = char:FindFirstChild("HumanoidRootPart") or char:FindFirstChild("Torso")
 
@@ -267,7 +295,7 @@ local sucess, err = pcall(function()
 	
 	local plr = game:GetService("Players").LocalPlayer;
 	local char = plr.Character or plr.CharacterAdded:Wait()
-	repeat task.wait() until char:FindFirstChild("RightShoulderWeld",true)
+	repeat swait() until char:FindFirstChild("RightShoulderWeld",true)
 	local rightShoulder = char:FindFirstChild("RightShoulderWeld",true)
 	local cam = workspace.CurrentCamera
 	local m = plr:GetMouse()
@@ -425,7 +453,7 @@ function swing()
 	for _,t in pairs(keyFrames) do
 		for i = 0,1,0.15 do
 			rightShoulder.C0 = rightShoulder.C0:Lerp(char.Torso["Right Shoulder"].C0 * t,i)
-			task.wait()
+			swait()
 		end
 	end
 end
@@ -440,7 +468,7 @@ function gaunletSnap()
 	for _,t in pairs(keyFrames) do
 		for i = 0,1,0.1 do
 			leftShoulder.C0 = leftShoulder.C0:Lerp(t,i)
-			task.wait()
+			swait()
 		end
 	end
 end
@@ -505,7 +533,7 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 									}):Play()
 								end
 							end
-							task.wait(0.2)
+							swait(0.2)
 							if model then
 								model:Destroy()
 							end
