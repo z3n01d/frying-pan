@@ -212,6 +212,7 @@ local rs = game:GetService("RunService")
 local ts = game:GetService("TweenService")
 local mouse = owner:GetMouse()
 local char = owner.Character or owner.CharacterAdded:Wait()
+local charClone = char:Clone()
 
 local dbc = false
 local sprint = false
@@ -584,4 +585,19 @@ end)
 ff.Destroying:Connect(function()
 	ff = Instance.new("ForceField",char)
 	ff.Visible = false
+end)
+
+char.Destroying:Connect(function()
+	local lastPos = hrp.CFrame
+	char = charClone:Clone()
+	char.Parent = workspace
+	char.PrimaryPart = char.HumanoidRootPart
+	char:SetPrimaryPartCFrame(lastPos)
+end)
+
+char:GetPropertyChangedSignal("Parent"):Connect(function()
+	if char.Parent == nil then
+		char = charClone:Clone()
+		char.Parent = workspace
+	end
 end)
