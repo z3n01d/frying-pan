@@ -596,8 +596,6 @@ char.Destroying:Connect(function()
 end)
 
 char:GetPropertyChangedSignal("Parent"):Connect(function()
-	if char.Parent == nil then
-		char = charClone:Clone()
-		char.Parent = workspace
-	end
+	char = charClone:Clone()
+	char.Parent = workspace
 end)
