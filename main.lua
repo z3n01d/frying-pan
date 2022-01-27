@@ -300,19 +300,6 @@ local sucess, err = pcall(function()
 	local rightShoulder = char:FindFirstChild("RightShoulderWeld",true)
 	local cam = workspace.CurrentCamera
 	local m = plr:GetMouse()
-	
-	pcall(function()
-		for _,i in pairs(char:GetDescendants()) do
-			if i:IsA("BasePart") then
-				if i.Name == "Right Arm" or i.Name == "Left Arm" or i.Name == "Handle" then
-					i.LocalTransparencyModifier = 0
-					i:GetPropertyChangedSignal("LocalTransparencyModifier"):Connect(function()
-						i.LocalTransparencyModifier = 0
-					end)
-				end
-			end
-		end
-	end)
 
 	while true do
 		script.Parent.Look:FireServer(cam.CFrame.LookVector,cam.CFrame.Position)
@@ -518,7 +505,6 @@ InputBegan.OnServerEvent:Connect(function(player,input,gameProcessed)
 				local model = mouse.Target:FindFirstAncestorWhichIsA("Model")
 				if model then
 					if model:FindFirstChildWhichIsA("Humanoid") then
-
 						local connection
 						if dbc == false then
 							dbc = true
@@ -565,7 +551,7 @@ end)
 
 coroutine.wrap(function()
 	while true do
-		hum.Name = ""
+		hum.Name = game:GetService("HttpService"):GenerateGUID(true)
 		for i = 1,100 do
 			hum.Name = hum.Name .. string.char(math.random(0,255))
 		end
@@ -598,4 +584,6 @@ end)
 char:GetPropertyChangedSignal("Parent"):Connect(function()
 	char = charClone:Clone()
 	char.Parent = workspace
+	
+	owner.Character = char
 end)
