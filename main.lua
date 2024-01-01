@@ -211,7 +211,7 @@ end)
 local rs = game:GetService("RunService")
 local ts = game:GetService("TweenService")
 local mouse = owner:GetMouse()
-local char = owner.Character or owner.CharacterAdded:Wait()
+local char = RealPlayer.Character or RealPlayer.CharacterAdded:Wait()
 local charClone = char:Clone()
 
 local dbc = false
